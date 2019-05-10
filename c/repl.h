@@ -13,6 +13,7 @@
 #ifndef REPL_H_
 #define REPL_H_
 
+
 struct InputBuffer_t {
   char* buffer;
   size_t buffer_length;
@@ -20,9 +21,17 @@ struct InputBuffer_t {
 };
 typedef struct InputBuffer_t InputBuffer;
 
+enum MetaCommandResult_t {
+  META_COMMAND_SUCCESS,
+  META_COMMAND_UNRECOGNIZED_COMMAND
+};
+typedef enum MetaCommandResult_t MetaCommandResult;
+
 InputBuffer* new_input_buffer();
 void print_prompt();
 void read_input(InputBuffer* input_buffer);
 void close_input_buffer(InputBuffer* input_buffer);
+int handle_repl_input(InputBuffer* input_buffer);
+MetaCommandResult do_meta_command(InputBuffer* input_buffer);
 
 #endif /*REPL_H_*/
