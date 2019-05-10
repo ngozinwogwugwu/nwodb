@@ -5,3 +5,10 @@ I'm going off of [this tutorial](https://cstack.github.io/db_tutorial), but I'll
 - [tutorial](https://cstack.github.io/db_tutorial/parts/part1.html)
 - [official SQLite documentation](https://cstack.github.io/db_tutorial/parts/part1.html)
 - writing a simple REPL (Read/Evaluate/Print Loop), writing a REPL in python
+- [check out the commit](https://github.com/ngozinwogwugwu/nwodb/commit/04c904b1331365947dcdfe6cd5ebed37af83523d)
+
+## Part 2
+The CStack DB Tutorial seems to put the entire database in [a single c file](https://github.com/cstack/db_tutorial/blob/master/db.c), so I'm going to spend some time here breaking up my code a bit.
+
+
+
