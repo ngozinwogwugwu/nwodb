@@ -4,3 +4,4 @@ node_modules/*
 nwodb
 
 *.out
+__pycache__/
