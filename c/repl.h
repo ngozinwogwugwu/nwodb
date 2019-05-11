@@ -13,6 +13,7 @@
 #ifndef REPL_H_
 #define REPL_H_
 
+#include "compiler.h"
 
 struct InputBuffer_t {
   char* buffer;
@@ -30,8 +31,6 @@ typedef enum MetaCommandResult_t MetaCommandResult;
 InputBuffer* new_input_buffer();
 void print_prompt();
 void read_input(InputBuffer* input_buffer);
-void close_input_buffer(InputBuffer* input_buffer);
-int handle_repl_input(InputBuffer* input_buffer);
-MetaCommandResult do_meta_command(InputBuffer* input_buffer);
+void handle_repl_input(InputBuffer* input_buffer);
 
 #endif /*REPL_H_*/

@@ -4,8 +4,7 @@
 #include <string.h>
 
 #include "repl.h"
-
-void print_prompt() { printf("nwodb > "); }
+#include "compiler.h"
 
 InputBuffer* new_input_buffer() {
   InputBuffer* input_buffer = malloc(sizeof(InputBuffer));
@@ -15,6 +14,8 @@ InputBuffer* new_input_buffer() {
 
   return input_buffer;
 }
+
+void print_prompt() { printf("nwodb > "); }
 
 void read_input(InputBuffer* input_buffer) {
   ssize_t bytes_read =
@@ -35,8 +36,9 @@ void close_input_buffer(InputBuffer* input_buffer) {
     free(input_buffer);
 }
 
-MetaCommandResult do_meta_command(InputBuffer* input_buffer) {
+MetaCommandResult handle_meta_command(InputBuffer* input_buffer) {
   if (strcmp(input_buffer->buffer, ".exit") == 0) {
+    close_input_buffer(input_buffer);
     exit(EXIT_SUCCESS);
   } else {
     printf("Unrecognized command '%s'\n", input_buffer->buffer);
@@ -44,12 +46,11 @@ MetaCommandResult do_meta_command(InputBuffer* input_buffer) {
   }
 }
 
-int handle_repl_input(InputBuffer* input_buffer) {
+void handle_repl_input(InputBuffer* input_buffer) {
   // handle meta commands
   if (input_buffer->buffer[0] == '.') {
-    return do_meta_command(input_buffer);
+    handle_meta_command(input_buffer);
+  } else {
+    handle_sql_command(input_buffer->buffer);
   }
-
-  // deal all other commands in the next commit
-  return META_COMMAND_SUCCESS;
 }
