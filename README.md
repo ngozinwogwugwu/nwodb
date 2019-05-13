@@ -17,7 +17,7 @@ The CStack DB Tutorial seems to put the entire database in [a single c file](htt
 ### Meta Commands
 On to the new functionality!
 - Handling _meta commands_. If the first character in the input buffer is a dot, `.`, then handle that meta command. Right now, all we handle is `.exit`.
-- [commit for this]((https://github.com/ngozinwogwugwu/nwodb/commit/349e2c1b83ee4576c411ea5e9bb4e681e36dc8b5))
+- [commit for this](https://github.com/ngozinwogwugwu/nwodb/commit/349e2c1b83ee4576c411ea5e9bb4e681e36dc8b5)
 
 ### SQL commands
 - Figure out the statement type. If the statement doesn't start with a `.`, then we can expect (for now) one of two things:
@@ -29,15 +29,25 @@ Let's make `compiler.c`/`compiler.h` files to handle this. These files will (for
 Right now, all we need to do with it is take in a user input, attempt to prepare it (right now, that means determining the statement type) and attempt to execute it (right now, that means just printing a confirmation to the terminal)
 - [commit for this](https://github.com/ngozinwogwugwu/nwodb/commit/91536e38d91229c92a79203f94f1e28cc84e02e7)
 
-
 ### New concepts
 - **Meta-Commands**: Commands like `.exit` that start with a dot. These are as commands for the CLI, rather than SQL queries
 - **Compiler**: The part of SQL that takes in a query and handles it
 
+## Part 3
+Using [part 3 of the tuorial](https://github.com/cstack/db_tutorial/blob/master/_parts/part3.md) as a guide, we'll add limited insert/select functionality (only on memory for now). Changes:
+- `vm.c`: handles the `execute_insert` and `execute_select` statements
+- `backend.c`: structure definitions for table & row, serialize/deserialize row into/out of memory
+
+More refactoring:
+- rename `repl.c` to `interface.c`. Rename `compiler.c` to `sql_command_processor.c`
+
+
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/91536e38d91229c92a79203f94f1e28cc84e02e7)
+
 # Python
 ## Part 1
 writing a simple REPL (Read/Evaluate/Print Loop), according to [part 1 of the tutorial](https://cstack.github.io/db_tutorial/parts/part1.html)
-- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/04c904b1331365947dcdfe6cd5ebed37af83523d)
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/13376236a74711ca51d6ac1fb6079314ba469b5a)
 
 ## Part 2
 ### Meta Commands
@@ -52,4 +62,4 @@ On Prepare, `SQL_statement` determines what kind of statement type we're dealing
   - `SELECT`
 
 The Execute statement just prints out what's going on for now, but we'll flesh it out later on.
-- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/8992189c91522e3b58ef4c1e56bc20caa3e74d87)
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/b733743e9379894c4d6698b16f27c394a2d026bd)
