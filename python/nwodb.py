@@ -1,6 +1,9 @@
 import sys
 from repl import handle_repl_input
+from compiler import handle_sql_command
+
+tree = [];
 
 while (True):
-  user_input = input('nwodb >>> ')
-  handle_repl_input(user_input)
+  user_input = handle_repl_input()
+  handle_sql_command(user_input, tree)

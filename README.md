@@ -42,7 +42,7 @@ More refactoring:
 - rename `repl.c` to `interface.c`. Rename `compiler.c` to `sql_command_processor.c`
 
 
-- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/91536e38d91229c92a79203f94f1e28cc84e02e7)
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/d2b2049e20a4fefcf70067ba31724130d5c583d4)
 
 # Python
 ## Part 1
@@ -63,3 +63,9 @@ On Prepare, `SQL_statement` determines what kind of statement type we're dealing
 
 The Execute statement just prints out what's going on for now, but we'll flesh it out later on.
 - [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/b733743e9379894c4d6698b16f27c394a2d026bd)
+
+## Part 3
+- add limited insert/select functionality (only on memory for now)
+- update `sql_statement.py` to handle the `execute_insert` and `execute_select` statements
+
+Tools for serialization: based on [this article](https://docs.python-guide.org/scenarios/serialization), I've decided to use Pickle Reason? Binary, native serialization.
