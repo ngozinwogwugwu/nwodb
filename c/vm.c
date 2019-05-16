@@ -7,7 +7,6 @@
 #include "backend.h"
 
 ExecuteResult execute_insert(Row* row_to_insert, Table* table) {
-  printf("inserting...\n");
   if (table->num_rows >= TABLE_MAX_ROWS) {
     return EXECUTE_TABLE_FULL;
   }
@@ -19,12 +18,11 @@ ExecuteResult execute_insert(Row* row_to_insert, Table* table) {
 }
 
 ExecuteResult execute_select(Table* table) {
-  printf("selecting...\n");
   Row row;
   for (uint32_t i = 0; i < table->num_rows; i++) {
     deserialize_row(get_row_slot_address(table, i), &row);
+    print_row(&row);
   }
-  print_row(&row);
   return EXECUTE_SUCCESS;
 }
 

@@ -41,8 +41,29 @@ Using [part 3 of the tuorial](https://github.com/cstack/db_tutorial/blob/master/
 More refactoring:
 - rename `repl.c` to `interface.c`. Rename `compiler.c` to `sql_command_processor.c`
 
-
 - [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/d2b2049e20a4fefcf70067ba31724130d5c583d4)
+
+## Part 4
+Introducing [rspec](http://rspec.info), unit testing in ruby (my first ruby ever)
+``` bash
+sudo gem install rspec
+touch test.rb
+rspec test.rb
+```
+
+Things for this commit:
+- catch and handle cases where the table is full
+- catch and handle cases where insert strings are too long
+- catch and handle cases where the insert ID is negative, or not a number
+- make it possible to make inserts for strings that are _almost_ too long
+
+Also, new unit tests. They test the following:
+- inserts and retreives a row
+- prints error message when table is full
+- allows inserting strings that are the maximum length
+- prints error message if strings are too long
+- prints an error message if id is negative
+- prints an error message if id is a string
 
 # Python
 ## Part 1

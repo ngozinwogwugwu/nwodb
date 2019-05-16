@@ -13,8 +13,10 @@
 
 enum PrepareResult_t {
   PREPARE_SUCCESS,
+  PREPARE_NEGATIVE_ID,
   PREPARE_SYNTAX_ERROR,
-  PREPARE_UNRECOGNIZED_STATEMENT
+  PREPARE_UNRECOGNIZED_STATEMENT,
+  PREPARE_STRING_TOO_LONG
 };
 typedef enum PrepareResult_t PrepareResult;
 
@@ -29,7 +31,8 @@ struct Statement_t {
 typedef struct Statement_t Statement;
 
 void handle_sql_command(char* buffer, Table* table);
+PrepareResult prepare_insert(char* buffer, Statement* statement);
 PrepareResult prepare_statement(char* buffer, Statement* statement);
 void print_prepare_result(PrepareResult prepare_result);
-
+void print_prepare_error(PrepareResult prepare_result);
 #endif /*COMPILER_H_*/
