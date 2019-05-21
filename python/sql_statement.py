@@ -1,4 +1,5 @@
 import pickle
+import constants
 
 class SQL_Statement:
   def __init__(self, sql_string):
@@ -23,9 +24,14 @@ class SQL_Statement:
   def handle_insert_command(self, tree):
     ## serialize the tokens into a byte array
     insert_row = self.format_insert_command(self.sql_string_array)
+
+    if (len(tree) >= constants.TABLE_MAX_ROWS):
+      print("Error: Table full.")
+      return
+
     if insert_row:
       tree.append(pickle.dumps(insert_row))
-    
+
 
   def format_insert_command(self, sql_string_array):
     insert_row = []
@@ -34,7 +40,13 @@ class SQL_Statement:
       return False
 
     try:
-      insert_row.append(int(sql_string_array[1]))
+      row_id = int(sql_string_array[1])
+
+      if (row_id <= 0):
+        print("row ID must be positive")
+        return False
+
+      insert_row.append(row_id)
     except ValueError:
       print("Second argument must be an integer")
       return False
@@ -44,5 +56,14 @@ class SQL_Statement:
     return insert_row
 
   def handle_select_command(self, tree):
+    if (self.format_select_command(self.sql_string_array) == False): return
+
     for row in tree:
       print(pickle.loads(row))
+
+  def format_select_command(self, sql_string_array):
+    if len(sql_string_array) != 1:
+      print("PREPARE_SYNTAX_ERROR: the select command takes no arguments")
+      return False
+
+    return True

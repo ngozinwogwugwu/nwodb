@@ -65,6 +65,8 @@ Also, new unit tests. They test the following:
 - prints an error message if id is negative
 - prints an error message if id is a string
 
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/af142b3491aad68598f7452d278507c76f34aa7a)
+
 # Python
 ## Part 1
 writing a simple REPL (Read/Evaluate/Print Loop), according to [part 1 of the tutorial](https://cstack.github.io/db_tutorial/parts/part1.html)
@@ -89,4 +91,19 @@ The Execute statement just prints out what's going on for now, but we'll flesh i
 - add limited insert/select functionality (only on memory for now)
 - update `sql_statement.py` to handle the `execute_insert` and `execute_select` statements
 
-Tools for serialization: based on [this article](https://docs.python-guide.org/scenarios/serialization), I've decided to use Pickle Reason? Binary, native serialization.
+Tools for serialization: based on [this article](https://docs.python-guide.org/scenarios/serialization), I've decided to use Pickle Reason? Binary, native serialization. Also, I don't need to deal with importing numpy without using anaconda
+
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/241f71de50d397c0a2eb80ae8b7b04e837b8c9a1)
+
+## Part 4 - Unit Tests
+I'm using the [built in python unit tests](https://docs.python.org/3/library/unittest.html) for this. Command for unittests:
+```
+python -m unittest test.py
+```
+
+I'm testing that my code:
+- handle correct and incorrect meta commands
+- handle correct and incorrect select commands
+- handle correct and incorrect insert commands
+- catches and handles cases where the table is full
+
