@@ -13,6 +13,8 @@
 #ifndef REPL_H_
 #define REPL_H_
 
+#include "backend.h"
+
 struct InputBuffer_t {
   char* buffer;
   size_t buffer_length;
@@ -29,6 +31,6 @@ typedef enum MetaCommandResult_t MetaCommandResult;
 InputBuffer* new_input_buffer();
 void print_prompt();
 void read_input(InputBuffer* input_buffer);
-MetaCommandResult handle_meta_command(InputBuffer* input_buffer);
+MetaCommandResult handle_meta_command(InputBuffer* input_buffer, Table* table);
 
 #endif /*REPL_H_*/

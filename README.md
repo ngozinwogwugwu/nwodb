@@ -3,11 +3,11 @@ I'm going off of [this tutorial](https://cstack.github.io/db_tutorial), but I'll
 - [official SQLite documentation](https://cstack.github.io/db_tutorial/parts/part1.html)
 
 # C
-## Part 1
+## Part 1: Read/Evaluate/Print Loop
 writing a simple REPL (Read/Evaluate/Print Loop), according to [part 1 of the tutorial](https://cstack.github.io/db_tutorial/parts/part1.html)
 - [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/04c904b1331365947dcdfe6cd5ebed37af83523d)
 
-## Part 2
+## Part 2: Commands
 My personal refactor, Implementing Meta Commands
 ### Refactor
 The CStack DB Tutorial seems to put the entire database in [a single c file](https://github.com/cstack/db_tutorial/blob/master/db.c), so I'm going to spend some time here breaking up my code a bit. You can see the results in [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/0ed5bb1b9f2b5e05628f5599578172480578f0d3)
@@ -33,7 +33,7 @@ Right now, all we need to do with it is take in a user input, attempt to prepare
 - **Meta-Commands**: Commands like `.exit` that start with a dot. These are as commands for the CLI, rather than SQL queries
 - **Compiler**: The part of SQL that takes in a query and handles it
 
-## Part 3
+## Part 3: Inserts & Selects
 Using [part 3 of the tuorial](https://github.com/cstack/db_tutorial/blob/master/_parts/part3.md) as a guide, we'll add limited insert/select functionality (only on memory for now). Changes:
 - `vm.c`: handles the `execute_insert` and `execute_select` statements
 - `backend.c`: structure definitions for table & row, serialize/deserialize row into/out of memory
@@ -43,7 +43,7 @@ More refactoring:
 
 - [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/d2b2049e20a4fefcf70067ba31724130d5c583d4)
 
-## Part 4
+## Part 4: Tests
 Introducing [rspec](http://rspec.info), unit testing in ruby (my first ruby ever)
 ``` bash
 sudo gem install rspec
@@ -66,6 +66,17 @@ Also, new unit tests. They test the following:
 - prints an error message if id is a string
 
 - [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/af142b3491aad68598f7452d278507c76f34aa7a)
+
+## Part 5: Persistence
+Okay, so in order to have persistence here, we need to write to disk. Since we're imitating SQLite, we need to make sure that we write our data in a way that matches with SQLite.
+- **pager**: an abstraction that we're going to use to read/write blocks of memory. We ask for page _n_, and it gives us page _n_
+  - _first it looks in the cache, then it looks on disk_
+  - for now, let's keep the pager within the `backend.c`, but it would make sense to make a separate `pager.c` file later in the project
+
+Because we're updating nwodb to save to disk, we'll be making most of our changes to `backend.c`. Specifically:
+- database functions: `db_open()`, `db_close()`, `db_flush()`, `db_deallocate()`
+- pager functions: `pager_flush()`, `pager_open()`, `create_page()`, `get_page()`
+
 
 # Python
 ## Part 1
@@ -107,3 +118,55 @@ I'm testing that my code:
 - handle correct and incorrect insert commands
 - catches and handles cases where the table is full
 
+# Tools
+
+### Looking at byte code
+If you want a good way to view a database file, you can use [hexdump](http://man7.org/linux/man-pages/man1/hexdump.1.html). When you use this on whatever database file you generate using nwodb, you should see something like this:
+```bash
+Ngozis-MacBook-Air:c ngozinwogwugwu$ hexdump -C my_file.db
+00000000  01 00 00 00 77 6f 6e 6b  61 00 00 00 40 00 00 00  |....wonka...@...|
+00000010  00 00 00 00 30 b9 2a ef  fe 7f 00 00 83 17 84 68  |....0.*........h|
+00000020  ff 7f 00 00 40 77 69 6c  6c 69 65 40 77 6f 6e 6b  |....@willie@wonk|
+00000030  61 2e 63 6f 6d 00 2a ef  fe 7f 00 00 98 b9 2a ef  |a.com.*.......*.|
+00000040  fe 7f 00 00 00 00 00 00  00 00 00 00 20 00 00 00  |............ ...|
+00000050  00 00 00 00 20 00 00 00  00 00 00 00 40 00 00 00  |.... .......@...|
+```
+
+you can specify things like output size, type of data and offset
+``` bash
+hexdump -d -s 16 -n 2 my_file.db
+```
+
+### Debugging in C
+Over the course of this project, I discovered that [LLDB](https://lldb.llvm.org/) comes preinstalled on most macs. I also learned (over the course of a frustrating afternoon) that gdb isn't the best thing to use if you're using OS X
+
+I got started with the help of [this tutorial](https://towardsdatascience.com/an-introduction-to-debugging-in-c-and-lldb-part-i-e3c51991f83a), and I'm keeping [this page](https://lldb.llvm.org/use/map.html#examining-variables) open while I work to use as a reference.
+
+If you're planning on compiling your code so that it can be used with LLDB, you'll need to change the makefile slightly:
+``` diff
+- gcc -o nwodb nwodb.c interface.c sql_command_processor.c vm.c backend.c -I.
++ cc -g -o nwodb nwodb.c interface.c sql_command_processor.c vm.c backend.c -I.
+```
+
+Here's a list of the commands that I use the most:
+``` bash
+
+# Starts your debugger with the nwodb executable
+lldb nwodb
+
+# set a breakpoint at line 22 and run the program
+breakpoint set -l 22
+run
+
+# frame var, shows variables in frame
+fr v
+
+# read from memory, specify size and format
+memory read --size 1 --format char[] 0x000000010020
+
+# execute a function, get the result
+expr (int) strlen("insert")
+
+# view a specific variable
+p buffer
+```

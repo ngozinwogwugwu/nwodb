@@ -25,7 +25,7 @@ PrepareResult prepare_statement(char* buffer, Statement* statement) {
 PrepareResult prepare_insert(char* buffer, Statement* statement) {
   statement->type = STATEMENT_INSERT;
 
-  char* keyword = strtok(buffer, " ");
+  char* keyword = strtok(buffer, " "); // this is not used
   char* id_string = strtok(NULL, " ");
   char* username = strtok(NULL, " ");
   char* email = strtok(NULL, " ");

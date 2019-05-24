@@ -37,9 +37,16 @@ struct Row_t {
 };
 typedef struct Row_t Row;
 
+struct Pager_t {
+  int file_descriptor;
+  uint32_t file_length;
+  void* pages[TABLE_MAX_PAGES];
+};
+typedef struct Pager_t Pager;
+
 struct Table_t {
   uint32_t num_rows;
-  void* pages[TABLE_MAX_PAGES];
+  Pager* pager;
 };
 typedef struct Table_t Table;
 
@@ -49,7 +56,12 @@ void serialize_row(Row* source, void* destination);
 void deserialize_row(void* source, Row* destination);
 void print_row(Row* row);
 
-Table* new_table();
+Table* db_open(const char* filename);
 void free_table(Table* table);
+void* create_page(Pager* pager, uint32_t page_num);
+void* get_page(Pager* pager, uint32_t page_num);
+Pager* pager_open(const char* filename);
+void db_close(Table* table);
+void pager_flush(Pager* pager, uint32_t page_num, uint32_t size);
 
 #endif /*BACKEND_H_*/

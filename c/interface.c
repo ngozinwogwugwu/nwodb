@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "interface.h"
+#include "backend.h"
 
 InputBuffer* new_input_buffer() {
   InputBuffer* input_buffer = malloc(sizeof(InputBuffer));
@@ -34,9 +35,9 @@ void close_input_buffer(InputBuffer* input_buffer) {
     free(input_buffer);
 }
 
-MetaCommandResult handle_meta_command(InputBuffer* input_buffer) {
+MetaCommandResult handle_meta_command(InputBuffer* input_buffer, Table* table) {
   if (strcmp(input_buffer->buffer, ".exit") == 0) {
-    close_input_buffer(input_buffer);
+    db_close(table);
     exit(EXIT_SUCCESS);
   } else {
     printf("Unrecognized command '%s'\n", input_buffer->buffer);
