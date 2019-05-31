@@ -1,9 +1,6 @@
-import sys
-from repl import handle_repl_input
-from compiler import handle_sql_command
+from interface import get_database_table
+from interface import nwodb_prompt
 
-tree = [];
-
+table = get_database_table()
 while (True):
-  user_input = handle_repl_input(input('nwodb >>> '))
-  handle_sql_command(user_input, tree)
+  nwodb_prompt(table)

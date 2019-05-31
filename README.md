@@ -118,6 +118,23 @@ I'm testing that my code:
 - handle correct and incorrect insert commands
 - catches and handles cases where the table is full
 
+## Part 5 - Persistence
+We need a way to make things persist. Also we need to figure out this pager stuff
+
+### Pagers
+**pages** are just blocks of data. In our case, we're using four kilobytes, but it can be whatever size you want. We're going to use a **pager** to load, store, and save all of our table data
+- the user doesn't really see the pager work, it's where we store the data and it doubles as a cache
+
+### table
+The table is what we use to look up the data based on row. We give it the row number, and it grabs that row information from its pager
+
+### reading/writing to/from disk
+
+### serialization
+I switched from `pickle` to `struct.pack` here. [the struct library](https://docs.python.org/3/library/struct.html) is good for storing things
+- to serialize, the biggest trick is to find the right format. `struct.pack` returns a byte object, and we can combine all the outputs into a byte array
+- to deserialize, there's a gotchya: if there's any garbage data, python will complain. That's why I include the function `get_first_non_ascii_byte()`, so that we can limit our deserialization for the *name* and *email*
+
 # Tools
 
 ### Looking at byte code
