@@ -4,8 +4,6 @@
 #include <string.h>
 
 #include "sql_command_processor.h"
-#include "backend.h"
-#include "vm.h"
 
 PrepareResult prepare_statement(char* buffer, Statement* statement) {
   //  we use strncmp for "insert" since the "insert" keyword will be followed by data

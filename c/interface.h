@@ -13,7 +13,7 @@
 #ifndef REPL_H_
 #define REPL_H_
 
-#include "backend.h"
+#include "table.h"
 
 struct InputBuffer_t {
   char* buffer;

@@ -5,7 +5,7 @@
 
 #include "interface.h"
 #include "sql_command_processor.h"
-#include "backend.h"
+#include "table.h"
 
 int main(int argc, char* argv[]) {
   InputBuffer* input_buffer = new_input_buffer();
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
   }
 
   char* filename = argv[1];
-  Table* table = db_open(filename);
+  Table* table = table_open(filename);
 
   while (true) {
     print_prompt();

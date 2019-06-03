@@ -36,7 +36,7 @@ Right now, all we need to do with it is take in a user input, attempt to prepare
 ## Part 3: Inserts & Selects
 Using [part 3 of the tuorial](https://github.com/cstack/db_tutorial/blob/master/_parts/part3.md) as a guide, we'll add limited insert/select functionality (only on memory for now). Changes:
 - `vm.c`: handles the `execute_insert` and `execute_select` statements
-- `backend.c`: structure definitions for table & row, serialize/deserialize row into/out of memory
+- `table.c`: structure definitions for table & row, serialize/deserialize row into/out of memory
 
 More refactoring:
 - rename `repl.c` to `interface.c`. Rename `compiler.c` to `sql_command_processor.c`
@@ -71,12 +71,21 @@ Also, new unit tests. They test the following:
 Okay, so in order to have persistence here, we need to write to disk. Since we're imitating SQLite, we need to make sure that we write our data in a way that matches with SQLite.
 - **pager**: an abstraction that we're going to use to read/write blocks of memory. We ask for page _n_, and it gives us page _n_
   - _first it looks in the cache, then it looks on disk_
-  - for now, let's keep the pager within the `backend.c`, but it would make sense to make a separate `pager.c` file later in the project
+  - for now, let's keep the pager within the `table.c`, but it would make sense to make a separate `pager.c` file later in the project
 
-Because we're updating nwodb to save to disk, we'll be making most of our changes to `backend.c`. Specifically:
-- database functions: `db_open()`, `db_close()`, `db_flush()`, `db_deallocate()`
+Because we're updating nwodb to save to disk, we'll be making most of our changes to `table.c`. Specifically:
+- database functions: `table_open()`, `table_close()`, `table_flush()`, `table_deallocate()`
 - pager functions: `pager_flush()`, `pager_open()`, `create_page()`, `get_page()`
 
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/35ad2da8ed0abe792bb4974a176dc4c2a9284785)
+
+## Part 6: The Cursor
+A cursor represents a location in the table. We can "move it around" the table by updating its `row_num` attribute
+
+Before I start, I think it's time to refactor:
+- split `backend.c` up into `pager.c`, `row.c` and `table.c`
+
+After that, add `cursor` to `table.c` and update the `execute` and `select` functions to use it.
 
 # Python
 ## Part 1
@@ -118,22 +127,26 @@ I'm testing that my code:
 - handle correct and incorrect insert commands
 - catches and handles cases where the table is full
 
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/c44bd02070b1419712dac7e8bc78f50e4f667c2c)
+
 ## Part 5 - Persistence
 We need a way to make things persist. Also we need to figure out this pager stuff
 
 ### Pagers
 **pages** are just blocks of data. In our case, we're using four kilobytes, but it can be whatever size you want. We're going to use a **pager** to load, store, and save all of our table data
 - the user doesn't really see the pager work, it's where we store the data and it doubles as a cache
+- the pager writes to disk when we're done with the program
 
 ### table
 The table is what we use to look up the data based on row. We give it the row number, and it grabs that row information from its pager
 
-### reading/writing to/from disk
 
 ### serialization
 I switched from `pickle` to `struct.pack` here. [the struct library](https://docs.python.org/3/library/struct.html) is good for storing things
 - to serialize, the biggest trick is to find the right format. `struct.pack` returns a byte object, and we can combine all the outputs into a byte array
 - to deserialize, there's a gotchya: if there's any garbage data, python will complain. That's why I include the function `get_first_non_ascii_byte()`, so that we can limit our deserialization for the *name* and *email*
+
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/4c1402337e1b98faae31439b161f07d2ae63f900)
 
 # Tools
 
@@ -161,8 +174,8 @@ I got started with the help of [this tutorial](https://towardsdatascience.com/an
 
 If you're planning on compiling your code so that it can be used with LLDB, you'll need to change the makefile slightly:
 ``` diff
-- gcc -o nwodb nwodb.c interface.c sql_command_processor.c vm.c backend.c -I.
-+ cc -g -o nwodb nwodb.c interface.c sql_command_processor.c vm.c backend.c -I.
+- gcc -o nwodb nwodb.c interface.c sql_command_processor.c vm.c table.c -I.
++ cc -g -o nwodb nwodb.c interface.c sql_command_processor.c vm.c table.c -I.
 ```
 
 Here's a list of the commands that I use the most:

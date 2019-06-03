@@ -13,7 +13,7 @@
 #ifndef VM_H_
 #define VM_H_
 
-#include "backend.h"
+#include "table.h"
 
 enum ExecuteResult_t { EXECUTE_SUCCESS, EXECUTE_TABLE_FULL };
 typedef enum ExecuteResult_t ExecuteResult;
