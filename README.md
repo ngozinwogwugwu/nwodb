@@ -87,6 +87,9 @@ Before I start, I think it's time to refactor:
 
 After that, add `cursor` to `table.c` and update the `execute` and `select` functions to use it.
 
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/93307104ea4fccf8f05946bfb0904e883fffb0c0)
+- [another commit](https://github.com/ngozinwogwugwu/nwodb/commit/b37d82a813437f305a6c0fb34e494eea76ae85b2) (moving the cursor functionality into its own file)
+
 # Python
 ## Part 1
 writing a simple REPL (Read/Evaluate/Print Loop), according to [part 1 of the tutorial](https://cstack.github.io/db_tutorial/parts/part1.html)
@@ -147,6 +150,11 @@ I switched from `pickle` to `struct.pack` here. [the struct library](https://doc
 - to deserialize, there's a gotchya: if there's any garbage data, python will complain. That's why I include the function `get_first_non_ascii_byte()`, so that we can limit our deserialization for the *name* and *email*
 
 - [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/4c1402337e1b98faae31439b161f07d2ae63f900)
+
+## Part 6 - Cursor
+First of all, I'm going to refactor again. Let's create a separate `Row` class. This will handle everything we were dealing with in `utils` (serialize/deserialize/print row), so we can also get rid of the `utils` file.
+
+Now let's add a `cursor` class. The cursor is a bookmark, and we use it to keep track of where we are for inserts and selects. This means that we can move a lot of the functionality from the `table` class to the `cursor` class (like `get_row` and `get_row_page`)
 
 # Tools
 

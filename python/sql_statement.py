@@ -1,5 +1,8 @@
-from table import Table
+import math
 import constants
+from table  import Table
+from row    import Row
+from cursor import Cursor
 
 class SQL_Statement:
   def __init__(self, sql_string):
@@ -19,24 +22,33 @@ class SQL_Statement:
 
 
   def handle_insert_command(self, table):
-    ## serialize the tokens into a byte array
-    row = self.format_insert_command()
-
     if (table.num_rows >= constants.TABLE_MAX_ROWS):
       print("Error: Table full.")
       return
 
-    if row:
-      table.insert(row)
+    row = self.get_row_from_insert_command()
+    if row == False: return
+
+    row.serialize()
+    cursor = Cursor(table, True)
+    page_num = math.floor(cursor.row_num/constants.ROWS_PER_PAGE)
+
+    table.pager.pages[page_num] = cursor.get_row_page() + row.byte_buffer
+    table.num_rows += 1
 
 
   def handle_select_command(self, table):
-    if (self.format_select_command()):
-      for row_num in range(0, table.num_rows):
-        print(table.get_row(row_num))
+    if (self.validate_select_command()):
+      cursor = Cursor(table)
+      while cursor.end_of_table == False:
+        row = Row()
+        row.byte_buffer = cursor.get_row_bytes()
+        row.deserialize()
+        row.print()
+        cursor.advance()
 
 
-  def format_insert_command(self):
+  def get_row_from_insert_command(self):
     if len(self.sql_string_array) != 4:
       print("PREPARE_SYNTAX_ERROR: the insert command takes three arguments - insert 1 name email@example.com")
       return False
@@ -65,10 +77,10 @@ class SQL_Statement:
       print("email too long: " + email)
       return False
 
-    return (user_id, name, email)
+    return Row(user_id, name, email)
 
 
-  def format_select_command(self):
+  def validate_select_command(self):
     if len(self.sql_string_array) != 1:
       print("PREPARE_SYNTAX_ERROR: the select command takes no arguments")
       return False
