@@ -4,7 +4,7 @@
 #include "pager.h"
 
 struct Table_t {
-  uint32_t num_rows;
+  uint32_t root_page_num;
   Pager* pager;
 };
 typedef struct Table_t Table;

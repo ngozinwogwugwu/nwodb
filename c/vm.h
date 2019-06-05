@@ -20,5 +20,6 @@ typedef enum ExecuteResult_t ExecuteResult;
 
 ExecuteResult execute_insert(Row* row_to_insert, Table* table);
 ExecuteResult execute_select(Table* table);
+void leaf_node_insert(Cursor* cursor, uint32_t key, Row* value);
 
 #endif /*VM_H_*/

@@ -32,5 +32,7 @@ InputBuffer* new_input_buffer();
 void print_prompt();
 void read_input(InputBuffer* input_buffer);
 MetaCommandResult handle_meta_command(InputBuffer* input_buffer, Table* table);
+void print_constants();
+void print_leaf_node(void* node);
 
 #endif /*REPL_H_*/
