@@ -3,6 +3,7 @@ import constants
 from table  import Table
 from row    import Row
 from cursor import Cursor
+from node   import Node
 
 class SQL_Statement:
   def __init__(self, sql_string):
@@ -22,30 +23,33 @@ class SQL_Statement:
 
 
   def handle_insert_command(self, table):
-    if (table.num_rows >= constants.TABLE_MAX_ROWS):
+    # set up
+    cursor = Cursor(table, True)
+    page = table.pager.get_page(cursor.page_num)
+    node = Node(page)
+    if (node.num_cells >= Node.LEAF_NODE_MAX_CELLS):
       print("Error: Table full.")
       return
 
+
+    # format the row to insert
     row = self.get_row_from_insert_command()
     if row == False: return
 
-    row.serialize()
-    cursor = Cursor(table, True)
-    page_num = math.floor(cursor.row_num/constants.ROWS_PER_PAGE)
+    # update the node, then update the table
+    node.insert(cursor.cell_num, row.id, row)
+    table.pager.pages[cursor.page_num] = node.page
 
-    table.pager.pages[page_num] = cursor.get_row_page() + row.byte_buffer
-    table.num_rows += 1
 
 
   def handle_select_command(self, table):
     if (self.validate_select_command()):
       cursor = Cursor(table)
+      node = Node(table.get_page(cursor.page_num))
+
       while cursor.end_of_table == False:
-        row = Row()
-        row.byte_buffer = cursor.get_row_bytes()
-        row.deserialize()
-        row.print()
-        cursor.advance()
+        node.get_row(cursor.cell_num).print()
+        cursor.advance(node.num_cells)
 
 
   def get_row_from_insert_command(self):
@@ -77,7 +81,9 @@ class SQL_Statement:
       print("email too long: " + email)
       return False
 
-    return Row(user_id, name, email)
+    row = Row(user_id, name, email)
+    row.serialize()
+    return row
 
 
   def validate_select_command(self):

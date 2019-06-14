@@ -1,6 +1,7 @@
 import os
 import math
 import constants
+from node import Node
 
 class Pager:
 
@@ -35,9 +36,11 @@ class Pager:
 
     return self.pages[page_num]
 
+
   def flush_page(self, page_num):
-    if (self.pages[page_num] == None):
+    page = self.get_page(page_num)
+    if (page == None):
       exit('Tried to flush null page')
 
     self.file.seek(page_num * constants.PAGE_SIZE)
-    self.file.write(self.pages[page_num])
+    self.file.write(page)

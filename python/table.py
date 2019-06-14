@@ -6,12 +6,18 @@ class Table:
 
   def __init__(self, filename):
     self.pager = Pager(filename)
-    self.num_rows = math.floor(self.pager.file_length/constants.ROW_SIZE)
+    self.root_page_num = 0
 
+  def get_page(self, page_num):
+    return self.pager.get_page(page_num)
+
+  def get_root_page(self):
+    return self.get_page(self.root_page_num)
+
+  # save pages to the file
   def flush(self):
-    # save pages to the file
-    total_pages = math.ceil(self.num_rows/constants.ROWS_PER_PAGE)
-    for full_page_index in range(0, total_pages):
-      self.pager.flush_page(full_page_index)
+    total_pages = 1
+    for page_num in range(0, total_pages):
+      self.pager.flush_page(page_num)
 
     self.pager.file.close()

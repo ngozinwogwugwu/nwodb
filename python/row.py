@@ -3,19 +3,23 @@ import struct
 import constants
 
 class Row:
+  # string formats for struct.pack
+  NAME_STRING_FORMAT       = '<33s'
+  EMAIL_STRING_FORMAT      = '<256s'
+  ENTIRE_ROW_FORMAT        = '<I33s256s'
 
   def __init__(self, row_id = 0, name = '', email = ''):
-    self.id    = row_id # id => uint32
-    self.name  = name   # name => char[33]
-    self.email = email  # email => char[256]
+    self.id          = row_id # id    => uint32
+    self.name        = name   # name  => char[33]
+    self.email       = email  # email => char[256]
     self.byte_buffer = bytearray()
 
 
   def serialize(self):
     self.byte_buffer = bytearray(
       struct.pack(constants.LITTLE_ENDIAN_INT_FORMAT, self.id) +
-      struct.pack(constants.NAME_STRING_FORMAT, bytes(self.name, 'ascii')) +
-      struct.pack(constants.EMAIL_STRING_FORMAT, bytes(self.email, 'ascii'))
+      struct.pack(self.NAME_STRING_FORMAT, bytes(self.name, 'ascii')) +
+      struct.pack(self.EMAIL_STRING_FORMAT, bytes(self.email, 'ascii'))
     )
 
 
@@ -24,7 +28,7 @@ class Row:
 
 
   def deserialize(self):
-    row_bytes = struct.unpack(constants.ENTIRE_ROW_FORMAT, self.byte_buffer)
+    row_bytes = struct.unpack(self.ENTIRE_ROW_FORMAT, self.byte_buffer)
 
     self.id = row_bytes[0]
     self.name = row_bytes[1][0 : self.get_first_non_ascii_byte(row_bytes[1])].decode('ascii')

@@ -1,10 +1,7 @@
 import math
 
-# string formats for struct.pack
+BOOL_FORMAT              = 'B'
 LITTLE_ENDIAN_INT_FORMAT = '<I'
-NAME_STRING_FORMAT       = '<33s'
-EMAIL_STRING_FORMAT      = '<256s'
-ENTIRE_ROW_FORMAT        = '<I33s256s'
 
 # field sizes
 ID_FIELD_SIZE    = 4

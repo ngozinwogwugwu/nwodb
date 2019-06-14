@@ -2,6 +2,7 @@ import os
 import sys
 import unittest
 import constants
+from node      import Node
 from io        import StringIO
 from table     import Table
 from interface import handle_repl_input
@@ -28,6 +29,38 @@ class TestNwoDB(unittest.TestCase):
     with self.assertRaises(SystemExit) as exit_code:
       handle_repl_input('.exit', table)
     self.assertEqual(exit_code.exception.code, 'bye!')
+
+  def test_constants_meta_command(self):
+    table = Table(DATABASE_NAME)
+    capturedOutput = StringIO()
+
+    sys.stdout = capturedOutput
+    handle_repl_input('.constants', table)
+    sys.stdout = sys.__stdout__
+
+    expected_output = "ROW_SIZE                  - 293\nCOMMON_NODE_HEADER_SIZE   - 6\nLEAF_NODE_HEADER_SIZE     - 10\nLEAF_NODE_CELL_SIZE       - 297\nLEAF_NODE_SPACE_FOR_CELLS - 4086\nLEAF_NODE_MAX_CELLS       - 13\n"
+    self.assertEqual(
+      capturedOutput.getvalue(),
+      expected_output
+    )
+    self.cleanup_db_file(table.pager.file)
+
+
+  def test_tree_meta_command(self):
+    table = Table(DATABASE_NAME)
+    capturedOutput = StringIO()
+
+    sys.stdout = capturedOutput
+    handle_sql_command('insert 1 user user@email.com', table)
+    handle_sql_command('insert 2 name name@email.com', table)
+    handle_repl_input('.tree', table)
+    sys.stdout = sys.__stdout__
+
+    self.assertEqual(
+      capturedOutput.getvalue(),
+      "node_type - 0\nis_root   - 0\nparent    - 0\nnum_cells - 2\n(1, 'user', 'user@email.com')\n(2, 'name', 'name@email.com')\n"
+    )
+    self.cleanup_db_file(table.pager.file)
 
 
   def test_insert(self):
@@ -142,11 +175,11 @@ class TestNwoDB(unittest.TestCase):
     capturedOutput = StringIO()
 
     # fill up the table
-    for i in range(1, constants.TABLE_MAX_ROWS + 1):
+    for i in range(1, Node.LEAF_NODE_MAX_CELLS + 1):
       handle_sql_command('insert ' + str(i) + ' two three', table)
 
     sys.stdout = capturedOutput
-    handle_sql_command('insert ' + str(constants.TABLE_MAX_ROWS + 1) + ' two three', table)
+    handle_sql_command('insert ' + str(Node.LEAF_NODE_MAX_CELLS + 1) + ' two three', table)
     sys.stdout = sys.__stdout__
 
     self.assertEqual(
