@@ -15,7 +15,11 @@
 
 #include "cursor.h"
 
-enum ExecuteResult_t { EXECUTE_SUCCESS, EXECUTE_TABLE_FULL };
+enum ExecuteResult_t {
+  EXECUTE_SUCCESS,
+  EXECUTE_DUPLICATE_KEY,
+  EXECUTE_TABLE_FULL
+};
 typedef enum ExecuteResult_t ExecuteResult;
 
 ExecuteResult execute_insert(Row* row_to_insert, Table* table);

@@ -136,9 +136,9 @@ describe 'database' do
       "nwodb > executed",
       "nwodb > Tree:",
       "leaf (size 3)",
-      "  - 0 : 3",
-      "  - 1 : 1",
-      "  - 2 : 2",
+      "  - 0 : 1",
+      "  - 1 : 2",
+      "  - 2 : 3",
       "nwodb > "
     ])
   end
@@ -161,4 +161,22 @@ describe 'database' do
       "nwodb > ",
     ])
   end
+
+  it 'prints an error message if there is a duplicate id' do
+    script = [
+      "insert 1 user1 person1@example.com",
+      "insert 1 user1 person1@example.com",
+      "select",
+      ".exit",
+    ]
+    result = run_script(script)
+    expect(result).to match_array([
+      "nwodb > executed",
+      "nwodb > Error: Duplicate key.",
+      "nwodb > (1, user1, person1@example.com)",
+      "executed",
+      "nwodb > ",
+    ])
+  end
+
 end

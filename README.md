@@ -90,6 +90,34 @@ After that, add `cursor` to `table.c` and update the `execute` and `select` func
 - [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/93307104ea4fccf8f05946bfb0904e883fffb0c0)
 - [another commit](https://github.com/ngozinwogwugwu/nwodb/commit/b37d82a813437f305a6c0fb34e494eea76ae85b2) (moving the cursor functionality into its own file)
 
+## Part 8: Implementing a Leaf Node
+So instead of saving rows directly to the table, we're goning to save them to a node. Each node has a header. The header saves the following information
+- `node_type` - whether it's a leaf node or an internal node. For now, we're only making leaf nodes
+- `is_root` - whether it's the root of the tree. For now, we're only dealing with a single node, so we can ignore this field
+- `pointer_to_parent` - this is also something we can ignore for now
+- `num_cells` - the number of cells in the node. Each cell contains a `key` and a `value `. In this case, the `value` is the row that we're inserting
+
+Since we're inserting into the node, we need to update the cursor. Rather than pointing directly to a row, We need to update the cursor so that it points at the **node** within the table, and the **cell** within the node
+
+We need to update the `pager`. We're going to think of pages as nodes here, so the only difference we need to make with the pager is for it to keep track of `num_pages`, rather than `file_length`
+
+We're making some updates to the table, too. We instantiate tables with a `root_page_number` (not something we need to think too hard about right now) instead of `num_rows`. If no leaf node exists, we need to make a new one. We need to update the `table_flush` function so that it flushes full pages, no partial ones.
+
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/69ac2c3bbf4cb2935b2c250f97f34934546b57e1)
+
+## Part 9: Binary Search and Duplicate Keys
+We're going to update this database so that it inserts your rows in order. This means that it can't have any duplicate keys, and it'll reject those. The changes we need to make are in `node.c`, `cursor.c` and `vm.c`
+
+### Changes to node.c
+- add a getter and a setter for the `node_type`. This means we can set it when we initialize the node, and we can get it later on when we want to check that the type of the node we're inserting to is indeed a leaf node.
+- `leaf_node_find_index()`: given a node and key, find the index that we'll use to insert the row
+
+### Changes to cursor.c
+- replace `table_end()` with `table_find()`. `table_find()` returns a cursor that is pointing at the cell closest to the given key, rather than the end of the table
+
+### Changes to vm.c
+- update `execute_insert()` to make sure there aren't duplicate keys, and to use `table_find()` rather than `table_end()`
+
 # Python
 ## Part 1
 writing a simple REPL (Read/Evaluate/Print Loop), according to [part 1 of the tutorial](https://cstack.github.io/db_tutorial/parts/part1.html)
@@ -155,6 +183,22 @@ I switched from `pickle` to `struct.pack` here. [the struct library](https://doc
 First of all, I'm going to refactor again. Let's create a separate `Row` class. This will handle everything we were dealing with in `utils` (serialize/deserialize/print row), so we can also get rid of the `utils` file.
 
 Now let's add a `cursor` class. The cursor is a bookmark, and we use it to keep track of where we are for inserts and selects. This means that we can move a lot of the functionality from the `table` class to the `cursor` class (like `get_row` and `get_row_page`)
+
+
+## Part 8 - Implementing a Leaf Node
+So instead of saving rows directly to the table, we're goning to save them to a node. Each node has a header. The header saves the following information
+- `node_type` - whether it's a leaf node or an internal node. For now, we're only making leaf nodes
+- `is_root` - whether it's the root of the tree. For now, we're only dealing with a single node, so we can ignore this field
+- `pointer_to_parent` - this is also something we can ignore for now
+- `num_cells` - the number of cells in the node. Each cell contains a `key` and a `value `. In this case, the `value` is the row that we're inserting
+
+Since we're inserting into the node, we need to update the cursor. Rather than pointing directly to a row, We need to update the cursor so that it points at the **node** within the table, and the **cell** within the node
+
+We need to update the `pager`. We're going to think of pages as nodes here, so the only difference we need to make with the pager is for it to keep track of `num_pages`, rather than `file_length`
+
+We're making some updates to the table, too. We instantiate tables with a `root_page_number` (not something we need to think too hard about right now) instead of `num_rows`. If no leaf node exists, we need to make a new one. We need to update the `table_flush` function so that it flushes full pages, no partial ones.
+
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/16d80611fb0410d8db7afd536c0407ad3c1e1565)
 
 # Tools
 

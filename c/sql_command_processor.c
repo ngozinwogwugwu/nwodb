@@ -18,8 +18,6 @@ PrepareResult prepare_statement(char* buffer, Statement* statement) {
   return PREPARE_UNRECOGNIZED_STATEMENT;
 }
 
-
-
 PrepareResult prepare_insert(char* buffer, Statement* statement) {
   statement->type = STATEMENT_INSERT;
 
@@ -74,6 +72,9 @@ void handle_execute_result(ExecuteResult execute_result) {
   switch(execute_result) {
     case (EXECUTE_SUCCESS):
       printf("executed\n");
+      break;
+    case (EXECUTE_DUPLICATE_KEY):
+      printf("Error: Duplicate key.\n");
       break;
     case (EXECUTE_TABLE_FULL):
       printf("Error: Table full.\n");
