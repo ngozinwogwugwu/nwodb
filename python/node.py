@@ -26,7 +26,7 @@ class Node:
   LEAF_NODE_MAX_CELLS       = math.floor(LEAF_NODE_SPACE_FOR_CELLS / LEAF_NODE_CELL_SIZE)
 
   def __init__(self, page = None):
-    self.node_type = self.NODE_TYPE_INTERNAL
+    self.type      = self.NODE_TYPE_LEAF
     self.is_root   = False
     self.parent    = 0
     self.num_cells = 0
@@ -35,6 +35,27 @@ class Node:
 
     if page != None: self.deserialize()
 
+
+  # Use a binary search to find one of the following
+  #  1. the given key
+  #  2. the end of the table
+  #  3. the smallest key in the node that is bigger than the given key
+  def find_index(self, key):
+    min_index = 0;
+    max_index = self.num_cells - 1
+
+    while max_index >= min_index:
+      index = math.floor((min_index + max_index + 1)/2)
+      key_at_index = self.cells[index][0]
+
+      if key == key_at_index:
+        return index
+      elif key < key_at_index:
+        max_index = index - 1
+      else:
+        min_index = index + 1
+
+    return min_index
 
   def insert(self, cell_num, key, row):
     if self.num_cells > self.LEAF_NODE_MAX_CELLS:
@@ -45,7 +66,7 @@ class Node:
     # If we're not appending to the end of the cells, we need to insert the new cell in the middle of the group.
     # We can do that by splitting the cells array into two chunks, then inserting the new cell in the middle
     if cell_num < self.num_cells:
-      self.cells = self.cells[:cell_num] + new_cell + self.cells[cell_num:]
+      self.cells = self.cells[:cell_num] + [new_cell] + self.cells[cell_num:]
     else:
       self.cells.append(new_cell)
 
@@ -55,7 +76,7 @@ class Node:
 
   def serialize(self):
     page = bytearray(
-      struct.pack(constants.BOOL_FORMAT, self.node_type) +
+      struct.pack(constants.BOOL_FORMAT, self.type) +
       struct.pack(constants.BOOL_FORMAT, self.is_root) +
       struct.pack(constants.LITTLE_ENDIAN_INT_FORMAT, self.parent) +
       struct.pack(constants.LITTLE_ENDIAN_INT_FORMAT, self.num_cells)
@@ -82,8 +103,8 @@ class Node:
     page_header_bytes = self.page[:self.NODE_HEADER_SIZE]
     page_cells_bytes  = self.page[self.NODE_HEADER_SIZE:]
 
-    page_header = struct.unpack(self.NODE_HEADER_FORMAT, page_header_bytes)
-    self.node_type = page_header[0]
+    page_header    = struct.unpack(self.NODE_HEADER_FORMAT, page_header_bytes)
+    self.type      = page_header[0]
     self.is_root   = page_header[1]
     self.parent    = page_header[2]
     self.num_cells = page_header[3]
@@ -105,6 +126,13 @@ class Node:
     row.deserialize()
 
     return (key, row)
+
+
+  def get_key(self, cell_num):
+    if cell_num >= self.num_cells:
+      exit('tried to access a cell that doesn\'t exist')
+
+    return self.cells[cell_num][0]
 
 
   def get_row(self, cell_num):

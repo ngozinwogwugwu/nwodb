@@ -23,21 +23,27 @@ class SQL_Statement:
 
 
   def handle_insert_command(self, table):
-    # set up
-    cursor = Cursor(table, True)
-    page = table.pager.get_page(cursor.page_num)
-    node = Node(page)
-    if (node.num_cells >= Node.LEAF_NODE_MAX_CELLS):
-      print("Error: Table full.")
-      return
-
-
     # format the row to insert
     row = self.get_row_from_insert_command()
     if row == False: return
 
+    # set up the cursor and the node
+    key_to_insert = row.id
+    cursor = Cursor(table)
+    node = Node(table.pager.get_page(cursor.page_num))
+    cursor.set_cell_num(node, key_to_insert)
+
+    # do some checks. If the table is full or that row is already occupied, return an error
+    if node.num_cells >= Node.LEAF_NODE_MAX_CELLS:
+      print("Error: Table full.")
+      return
+
+    if cursor.cell_num < node.num_cells and node.get_key(cursor.cell_num) == key_to_insert:
+      print("Error: Duplicate key.")
+      return
+
     # update the node, then update the table
-    node.insert(cursor.cell_num, row.id, row)
+    node.insert(cursor.cell_num, key_to_insert, row)
     table.pager.pages[cursor.page_num] = node.page
 
 

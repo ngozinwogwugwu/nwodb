@@ -52,13 +52,14 @@ class TestNwoDB(unittest.TestCase):
 
     sys.stdout = capturedOutput
     handle_sql_command('insert 1 user user@email.com', table)
+    handle_sql_command('insert 3 name name@email.com', table)
     handle_sql_command('insert 2 name name@email.com', table)
     handle_repl_input('.tree', table)
     sys.stdout = sys.__stdout__
 
     self.assertEqual(
       capturedOutput.getvalue(),
-      "node_type - 0\nis_root   - 0\nparent    - 0\nnum_cells - 2\n(1, 'user', 'user@email.com')\n(2, 'name', 'name@email.com')\n"
+      "type      - 1\nis_root   - 0\nparent    - 0\nnum_cells - 3\n(1, 'user', 'user@email.com')\n(2, 'name', 'name@email.com')\n(3, 'name', 'name@email.com')\n"
     )
     self.cleanup_db_file(table.pager.file)
 
@@ -76,6 +77,22 @@ class TestNwoDB(unittest.TestCase):
     self.assertEqual(
       capturedOutput.getvalue(),
       "(1, 'user', 'user@email.com')\n(2, 'name', 'name@email.com')\n"
+    )
+    self.cleanup_db_file(table.pager.file)
+
+  def test_double_insert_displays_error(self):
+    table = Table(DATABASE_NAME)
+    capturedOutput = StringIO()
+
+    sys.stdout = capturedOutput
+    handle_sql_command('insert 1 user user@email.com', table)
+    handle_sql_command('insert 2 name name@email.com', table)
+    handle_sql_command('insert 2 other name@email.com', table)
+    sys.stdout = sys.__stdout__
+
+    self.assertEqual(
+      capturedOutput.getvalue(),
+      "Error: Duplicate key.\n"
     )
     self.cleanup_db_file(table.pager.file)
 

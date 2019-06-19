@@ -18,7 +18,7 @@ def handle_sql_command(sql_command, table):
 
 def print_leaf_node(node):
   print(
-    "node_type - " + str(node.node_type) + "\n" +
+    "type      - " + str(node.type) + "\n" +
     "is_root   - " + str(node.is_root)   + "\n" +
     "parent    - " + str(node.parent)    + "\n" +
     "num_cells - " + str(node.num_cells)

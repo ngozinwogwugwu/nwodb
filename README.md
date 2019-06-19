@@ -200,6 +200,16 @@ We're making some updates to the table, too. We instantiate tables with a `root_
 
 - [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/16d80611fb0410d8db7afd536c0407ad3c1e1565)
 
+## Part 9 - Binary Search and Duplicate Keys
+We need to update the database so it does two things:
+1. insert rows so that they're stored in order of key
+2. prevent users from entering rows with duplicate keys
+
+The first change we need to make is to `node.py`. We need to implement a `find_index()` function, that takes a _key_ and returns an _index_. The interesting thing about the `find_index()` function is that it uses _binary search_ to determine the index. We also update the constructor so that it sets the `type` to be `NODE_TYPE_LEAF`
+
+After that, we update `cursor.py` with a `set_cell_num()` function. This function takes a key, and uses `node.find_index()` to set the `cell_num`. We use this cursor to inform `sql_statement.py` about where exactly to insert. If there's already a cell there that has that key, report an error to the user.
+
+
 # Tools
 
 ### Looking at byte code
