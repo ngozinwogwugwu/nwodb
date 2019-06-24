@@ -19,6 +19,7 @@ Table* table_open(const char* filename) {
     // New database file. Initialize page 0 as leaf node.
     void* root_node = get_page(pager, 0);
     initialize_leaf_node(root_node);
+    set_node_root(root_node, true);
   }
  
   return table;

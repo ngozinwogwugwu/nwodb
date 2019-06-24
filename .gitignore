@@ -3,7 +3,7 @@
 node_modules/*
 nwodb*
 *.dsYM
-test.db
+*test.db
 
 *.out
 __pycache__/

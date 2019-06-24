@@ -33,6 +33,7 @@ void print_prompt();
 void read_input(InputBuffer* input_buffer);
 MetaCommandResult handle_meta_command(InputBuffer* input_buffer, Table* table);
 void print_constants();
-void print_leaf_node(void* node);
+void indent(uint32_t level);
+void print_tree(Pager* pager, uint32_t page_num, uint32_t indentation_level);
 
 #endif /*REPL_H_*/

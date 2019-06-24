@@ -5,7 +5,6 @@
 
 #include "interface.h"
 #include "sql_command_processor.h"
-#include "table.h"
 
 int main(int argc, char* argv[]) {
   InputBuffer* input_buffer = new_input_buffer();
