@@ -1,9 +1,9 @@
 import math
 import constants
-from table  import Table
-from row    import Row
-from cursor import Cursor
-from node   import Node
+
+from table     import Table
+from row       import Row
+from vm        import VM
 
 class SQL_Statement:
   def __init__(self, sql_string):
@@ -13,6 +13,7 @@ class SQL_Statement:
       'insert': self.handle_insert_command,
       'select': self.handle_select_command
     }
+    self.vm = VM()
 
   def execute(self, table):
     if self.statement_type not in self.command_executions:
@@ -25,38 +26,15 @@ class SQL_Statement:
   def handle_insert_command(self, table):
     # format the row to insert
     row = self.get_row_from_insert_command()
-    if row == False: return
 
-    # set up the cursor and the node
-    key_to_insert = row.id
-    cursor = Cursor(table)
-    node = Node(table.pager.get_page(cursor.page_num))
-    cursor.set_cell_num(node, key_to_insert)
-
-    # do some checks. If the table is full or that row is already occupied, return an error
-    if node.num_cells >= Node.LEAF_NODE_MAX_CELLS:
-      print("Error: Table full.")
+    if not row:
       return
-
-    if cursor.cell_num < node.num_cells and node.get_key(cursor.cell_num) == key_to_insert:
-      print("Error: Duplicate key.")
-      return
-
-    # update the node, then update the table
-    node.insert(cursor.cell_num, key_to_insert, row)
-    table.pager.pages[cursor.page_num] = node.page
-
+    self.vm.insert_row(row, table)
 
 
   def handle_select_command(self, table):
     if (self.validate_select_command()):
-      cursor = Cursor(table)
-      node = Node(table.get_page(cursor.page_num))
-
-      while cursor.end_of_table == False:
-        node.get_row(cursor.cell_num).print()
-        cursor.advance(node.num_cells)
-
+      self.vm.select_all_rows(table)
 
   def get_row_from_insert_command(self):
     if len(self.sql_string_array) != 4:

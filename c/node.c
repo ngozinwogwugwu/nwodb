@@ -92,8 +92,8 @@ uint32_t* internal_node_child(void* node, uint32_t child_num) {
   }
 }
 
-uint32_t* internal_node_key(void* node, uint32_t key_num) {
-  return internal_node_cell(node, key_num) + INTERNAL_NODE_CHILD_SIZE;
+uint32_t* internal_node_key(void* node, uint32_t cell_num) {
+  return node + INTERNAL_NODE_HEADER_SIZE + (cell_num * INTERNAL_NODE_CELL_SIZE) + INTERNAL_NODE_CHILD_SIZE;
 }
 
 bool is_node_root(void* node) {

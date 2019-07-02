@@ -1,3 +1,5 @@
+<a href='http://www.recurse.com' title='Made with love at the Recurse Center'><img src='https://cloud.githubusercontent.com/assets/2883345/11325206/336ea5f4-9150-11e5-9e90-d86ad31993d8.png' height='20px'/></a>
+
 # NwoDB - My attempt to build a database
 I'm going off of [this tutorial](https://cstack.github.io/db_tutorial), but I'll see if I can do the same work in Python, just to make sure I understand
 - [official SQLite documentation](https://cstack.github.io/db_tutorial/parts/part1.html)
@@ -118,6 +120,16 @@ We're going to update this database so that it inserts your rows in order. This 
 ### Changes to vm.c
 - update `execute_insert()` to make sure there aren't duplicate keys, and to use `table_find()` rather than `table_end()`
 
+## Part 10: Splitting A Leaf Node
+We're going to split a leaf node when it gets too big for a page to hold. This means that when a node has enough entries to exceed four KB, we need to do the following:
+1. allocate another page (this will represent the right leaf node)
+2. copy the biggest values to the right leaf node
+3. Turn the original page into an internal node:
+  a. allocate another page for the left node, copy all the smaller values to that page
+  b. overwrite the data on the original node. Set the type to be an internal node, and indicate which pages are its left and right nodes
+
+This means we have to flesh out our idea of an internal node and update our VM so that it can handle the leaf node split
+
 # Python
 ## Part 1
 writing a simple REPL (Read/Evaluate/Print Loop), according to [part 1 of the tutorial](https://cstack.github.io/db_tutorial/parts/part1.html)
@@ -209,6 +221,14 @@ The first change we need to make is to `node.py`. We need to implement a `find_i
 
 After that, we update `cursor.py` with a `set_cell_num()` function. This function takes a key, and uses `node.find_index()` to set the `cell_num`. We use this cursor to inform `sql_statement.py` about where exactly to insert. If there's already a cell there that has that key, report an error to the user.
 
+## Part 10 - Splitting a Leaf Node
+So the first thing we need is a concept of an internal node. This is basically the same as a Leaf node, but the header contains a pointer to the right child, and the cells are all (highest-keys/nth-child). Most of the work here is going to be creating a generic node class, and using it as the base for a leaf node class and and internal node class.
+
+After that, we need to handle actual splits. I'm doing the splits in a new class called `VM.py` (since it was starting to get ridiculous to handle everything in the SQL_Statement class). I essentially create a new left and right node using the values in the original node (along with the user-inserted value). After that, I create a new internal node to serve as the root, and I used it to replace the initial leaf node.
+
+The last step was to make sure I was splitting the leaf node correctly. This means:
+- A. Unit tests
+- B. A way to print out the tree
 
 # Tools
 
