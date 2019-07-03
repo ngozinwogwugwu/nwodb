@@ -130,6 +130,12 @@ We're going to split a leaf node when it gets too big for a page to hold. This m
 
 This means we have to flesh out our idea of an internal node and update our VM so that it can handle the leaf node split
 
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/47d3a9c27a21824c86f7403a6d184cde5d2ea464)
+
+
+## Part 11: Recursively Searching the B-Tree
+Okay, so we're basically just adding `internal_node_find()`. This function does a binary search on the internal node in order to find the page number of its child. Once it does that, we can pull up that leaf node and use `leaf_node_find()` to find the row.
+
 # Python
 ## Part 1
 writing a simple REPL (Read/Evaluate/Print Loop), according to [part 1 of the tutorial](https://cstack.github.io/db_tutorial/parts/part1.html)
@@ -226,9 +232,13 @@ So the first thing we need is a concept of an internal node. This is basically t
 
 After that, we need to handle actual splits. I'm doing the splits in a new class called `VM.py` (since it was starting to get ridiculous to handle everything in the SQL_Statement class). I essentially create a new left and right node using the values in the original node (along with the user-inserted value). After that, I create a new internal node to serve as the root, and I used it to replace the initial leaf node.
 
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/3702fb1d5da9950f2ca89a109cb9f0c7143a5b53)
+
 The last step was to make sure I was splitting the leaf node correctly. This means:
 - A. Unit tests
 - B. A way to print out the tree
+
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/186006a0704c3eeaa4f95c7b62e855f9548138db)
 
 # Tools
 

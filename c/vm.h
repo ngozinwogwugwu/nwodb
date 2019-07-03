@@ -26,7 +26,5 @@ ExecuteResult execute_insert(Row* row_to_insert, Table* table);
 ExecuteResult execute_select(Table* table);
 void leaf_node_insert(Cursor* cursor, uint32_t key, Row* value);
 void leaf_node_split_and_insert(Cursor* cursor, uint32_t key, Row* value);
-void * create_new_leaf_node(Cursor* cursor);
-void create_new_root(Table* table, uint32_t right_child_page_num);
 
 #endif /*VM_H_*/

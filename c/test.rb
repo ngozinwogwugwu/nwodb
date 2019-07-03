@@ -151,7 +151,8 @@ describe 'database' do
       "    - 12",
       "    - 13",
       "    - 14",
-      "nwodb > Need to implement searching an internal node",
+      "nwodb > executed",
+      "nwodb > ",
     ])
   end
 
