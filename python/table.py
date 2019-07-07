@@ -28,4 +28,3 @@ class Table:
       self.pager.flush_page(page_num)
 
     self.pager.file.close()
-

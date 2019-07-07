@@ -12,22 +12,24 @@ class VM:
     # set up the cursor and the leaf node
     key_to_insert = row.id
     cursor = Cursor(table)
-    leaf_node = Leaf_Node(table.pager.get_page(cursor.page_num))
+    cursor.find_page(key_to_insert)
+    leaf_node = Leaf_Node(cursor.get_page())
     cursor.set_cell_num(leaf_node, key_to_insert)
 
     # do some checks. If the table is full or that row is already occupied, return an error
+    if cursor.cell_num < leaf_node.num_cells and leaf_node.get_key(cursor.cell_num) == key_to_insert:
+      print("Error: Duplicate key.")
+      return
+
     if leaf_node.num_cells >= Leaf_Node.LEAF_NODE_MAX_CELLS:
       root_node = self.split_nodes_and_insert_row(leaf_node, (key_to_insert, row), cursor.cell_num, table)
       table.pager.overwrite_page(root_node, cursor.page_num)
       return
 
-    if cursor.cell_num < leaf_node.num_cells and leaf_node.get_key(cursor.cell_num) == key_to_insert:
-      print("Error: Duplicate key.")
-      return
-
     # update the leaf node, then update the table
     leaf_node.insert(cursor.cell_num, key_to_insert, row)
-    table.pager.pages[cursor.page_num] = leaf_node.page
+    table.pager.overwrite_page(leaf_node, cursor.page_num)
+
 
   def select_all_rows(self, table):
     cursor = Cursor(table)
@@ -49,7 +51,7 @@ class VM:
 
   def make_right_and_left_leaf_nodes(self, node_cells, new_cell, cell_num):
     # create an array that includes the cell to insert
-    if cell_num < (len(node_cells)-1):
+    if cell_num < (len(node_cells)):
       node_cells = node_cells[:cell_num] + [new_cell] + node_cells[cell_num:]
     else:
       node_cells.append(new_cell)

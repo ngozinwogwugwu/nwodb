@@ -39,8 +39,8 @@ def print_tree(table):
     print_leaf_node(Leaf_Node(table.pager.get_page(0)))
     return;
 
-  print("num keys: " + str(root_node.num_keys))
-  for key in range(0, root_node.num_keys):
+  print("num keys: " + str(root_node.num_cells))
+  for key in range(0, root_node.num_cells):
     (page_num, max_key) = root_node.cells[key]
     print_leaf_node(Leaf_Node(table.pager.get_page(page_num)))
     print("max key: " + str(max_key))

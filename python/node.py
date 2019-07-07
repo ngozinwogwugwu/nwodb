@@ -34,7 +34,7 @@ class Node:
 
     while max_index >= min_index:
       index = math.floor((min_index + max_index + 1)/2)
-      key_at_index = self.cells[index][0]
+      key_at_index = self.get_key(index)
 
       if key == key_at_index:
         return index
@@ -46,20 +46,27 @@ class Node:
     return min_index
 
   def get_key(self, cell_num):
-    if cell_num >= self.num_cells:
-      exit('tried to access a cell that doesn\'t exist')
+    (key, value) = self.get_cell(cell_num)
 
-    return self.cells[cell_num][0]
+    # the values for internal nodes are the cell numbers
+    if self.type == self.NODE_TYPE_INTERNAL:
+      return value
+
+    return key
 
   def get_max_key(self):
     # get the key from the final cell in the cells array
     return self.get_key(-1)
 
   def get_cell_value(self, cell_num):
+    (key, value) = self.get_cell(cell_num)
+    return value
+
+  def get_cell(self, cell_num):
     if cell_num >= self.num_cells:
       exit('tried to access a cell that doesn\'t exist')
 
-    return self.cells[cell_num][1]
+    return self.cells[cell_num]
 
 
   def deserialize(self):

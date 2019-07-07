@@ -2,6 +2,8 @@ import constants
 import math
 from table import Table
 from node import Node
+from leaf_node import Leaf_Node
+from internal_node import Internal_Node
 from row import Row
 
 class Cursor:
@@ -24,6 +26,7 @@ class Cursor:
     self.cell_num += 1
     self.end_of_table = (self.cell_num >= num_node_cells)
 
+
   def set_cell_num(self, node, key):
     if node.type is not Node.NODE_TYPE_LEAF:
       print("I still need to implement search through internal nodes")
@@ -31,3 +34,14 @@ class Cursor:
 
     self.cell_num = node.find_index(key)
 
+  def find_page(self, key):
+    node = Internal_Node(self.get_page())
+
+    # If we've reached a leaf node, this is the page we're looking for
+    if node.type == Node.NODE_TYPE_LEAF:
+      return
+
+    # If this isn't a leaf node, figure out where to find the next node in the tree
+    self.page_num = node.get_child_page_num(key)
+
+    self.find_page(key)

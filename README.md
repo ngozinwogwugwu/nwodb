@@ -134,7 +134,10 @@ This means we have to flesh out our idea of an internal node and update our VM s
 
 
 ## Part 11: Recursively Searching the B-Tree
-Okay, so we're basically just adding `internal_node_find()`. This function does a binary search on the internal node in order to find the page number of its child. Once it does that, we can pull up that leaf node and use `leaf_node_find()` to find the row.
+Okay, so we're basically just adding `internal_node_find()`. This function does a binary search on the internal node in order to find the page number of its child. Once it does that, we can pull up that leaf node and use `leaf_node_find()` to find the row. Once we do this, we can make inserts to child nodes
+
+- [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/ed6fe53c127f33db2d6616517cdc425255825028)
+
 
 # Python
 ## Part 1
@@ -239,6 +242,14 @@ The last step was to make sure I was splitting the leaf node correctly. This mea
 - B. A way to print out the tree
 
 - [the commit](https://github.com/ngozinwogwugwu/nwodb/commit/186006a0704c3eeaa4f95c7b62e855f9548138db)
+
+## Part 11 - Recursively Searching the B-Tree
+We're trying to make inserts to child nodes here. This means that we need to recursively traverse the tree until we find a leaf node. Once we do that, we can make an insert
+
+Updates:
+- add a function to the cursor called `find_page()`, which uses recursion and traverses the tree to find the leaf node we need
+- add a function to the internal node class called `get_child_page_num()`, which determines where the proper child node is in our pager
+- update the `insert` function in the VM so that it finds the correct leaf node before it tries to make an insert
 
 # Tools
 
